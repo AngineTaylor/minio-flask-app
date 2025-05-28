@@ -1,15 +1,17 @@
 from flask import Flask, render_template, request, redirect, url_for, send_file
 import boto3
 from botocore.client import Config
+import os
 
 app = Flask(__name__)
 BUCKET = "my-files-bucket"
 
+# Используем переменные окружения для настройки S3 клиента
 s3 = boto3.client(
     's3',
-    endpoint_url='https://2b63-156-146-34-246.ngrok-free.app/',
-    aws_access_key_id='minioadmin',
-    aws_secret_access_key='minioadmin',
+    endpoint_url=os.getenv("S3_ENDPOINT", "https://2b63-156-146-34-246.ngrok-free.app/ "),
+    aws_access_key_id=os.getenv("AWS_ACCESS_KEY_ID", "minioadmin"),
+    aws_secret_access_key=os.getenv("AWS_SECRET_ACCESS_KEY", "minioadmin"),
     config=Config(signature_version='s3v4'),
 )
 
@@ -18,6 +20,7 @@ def index():
     try:
         files = s3.list_objects(Bucket=BUCKET).get('Contents', [])
     except Exception as e:
+        print(f"Error fetching files: {e}")
         files = []
     return render_template('index.html', files=files)
 
@@ -30,14 +33,23 @@ def upload():
     if file.filename == '':
         return redirect(url_for('index'))
 
-    s3.upload_fileobj(file, BUCKET, file.filename)
+    try:
+        s3.upload_fileobj(file, BUCKET, file.filename)
+    except Exception as e:
+        print(f"Upload error: {e}")
+        return redirect(url_for('index'))
     return redirect(url_for('index'))
 
 @app.route('/download/<filename>')
 def download(filename):
     file_path = f"/tmp/{filename}"
-    s3.download_file(BUCKET, filename, file_path)
+    try:
+        s3.download_file(BUCKET, filename, file_path)
+    except Exception as e:
+        print(f"Download error: {e}")
+        return redirect(url_for('index'))
     return send_file(file_path, as_attachment=True)
 
 if __name__ == '__main__':
-    app.run(debug=True)
+    port = int(os.environ.get("PORT", 5000))
+    app.run(host='0.0.0.0', port=port)
