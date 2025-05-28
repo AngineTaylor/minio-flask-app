@@ -6,10 +6,10 @@ import os
 app = Flask(__name__)
 BUCKET = os.getenv("BUCKET", "my-files-bucket")
 
-# Убедись, что ты используешь правильный endpoint_url (порт 9000)
+
 s3 = boto3.client(
     's3',
-    endpoint_url=os.getenv("S3_ENDPOINT", "https://c7af-79-110-55-50.ngrok-free.app "),
+    endpoint_url=os.getenv("S3_ENDPOINT", "http://localhost:9000"),
     aws_access_key_id=os.getenv("AWS_ACCESS_KEY_ID", "minioadmin"),
     aws_secret_access_key=os.getenv("AWS_SECRET_ACCESS_KEY", "minioadmin"),
     config=Config(signature_version='s3v4', s3={'addressing_style': 'path'})
