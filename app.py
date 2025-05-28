@@ -7,7 +7,7 @@ BUCKET = "my-files-bucket"
 
 s3 = boto3.client(
     's3',
-    endpoint_url='http://localhost:9000',
+    endpoint_url='https://2b63-156-146-34-246.ngrok-free.app/',
     aws_access_key_id='minioadmin',
     aws_secret_access_key='minioadmin',
     config=Config(signature_version='s3v4'),
