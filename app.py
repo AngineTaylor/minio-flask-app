@@ -9,10 +9,10 @@ BUCKET = "my-files-bucket"
 # Используем переменные окружения для настройки S3 клиента
 s3 = boto3.client(
     's3',
-    endpoint_url=os.getenv("S3_ENDPOINT", "https://2b63-156-146-34-246.ngrok-free.app/ "),
-    aws_access_key_id=os.getenv("AWS_ACCESS_KEY_ID", "minioadmin"),
-    aws_secret_access_key=os.getenv("AWS_SECRET_ACCESS_KEY", "minioadmin"),
-    config=Config(signature_version='s3v4'),
+    endpoint_url='https://c7af-79-110-55-50.ngrok-free.app/ ',
+    aws_access_key_id='minioadmin',
+    aws_secret_access_key='minioadmin',
+    config=Config(signature_version='s3v4', s3={'addressing_style': 'path'})
 )
 
 @app.route('/')
