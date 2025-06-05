@@ -4,11 +4,13 @@ from botocore.client import Config
 import os
 from flask_sqlalchemy import SQLAlchemy
 
-# === Создаём приложение Flask ===
 app = Flask(__name__)
 
-# === Настройка базы данных (PostgreSQL или SQLite для локального запуска) ===
-app.config['SQLALCHEMY_DATABASE_URI'] = os.getenv("DATABASE_URL", "sqlite:///files.db")
+# === Настройка базы данных с заменой postgres:// → postgresql:// ===
+db_url = os.getenv("DATABASE_URL", "sqlite:///files.db")
+if db_url.startswith("postgres://"):
+    db_url = db_url.replace("postgres://", "postgresql://", 1)
+app.config['SQLALCHEMY_DATABASE_URI'] = db_url
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 
 # === Инициализируем SQLAlchemy ===
@@ -26,7 +28,7 @@ class File(db.Model):
 with app.app_context():
     db.create_all()
 
-# === Настройка клиента S3 (MinIO) ===
+# === MinIO клиент ===
 s3 = boto3.client(
     's3',
     endpoint_url=os.getenv("S3_ENDPOINT", "http://localhost:9000"),
